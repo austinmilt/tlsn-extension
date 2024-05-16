@@ -9,12 +9,13 @@
 
 <img src="src/assets/img/icon-128.png" width="64"/>
 
-# Eternis Take-home TODO
+# Eternis challenge TODO
 
+- [x] Read [engineering challenge doc](https://eternis.notion.site/Engineering-challenge-afb931caee2245fc9b45f51930821248)
 - [x] Read up on [TLS](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/tls.html)
 - [x] Read up on [TLSNotary](https://tlsnotary.org/)
-- [ ] Get dev extension running without changes
-- [ ] Do warmup changes
+- [x] Get dev extension running without changes
+- [x] Do warmup changes
 - [ ] Do Problem 1
 - [ ] Do Problem 2
 
