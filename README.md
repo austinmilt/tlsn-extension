@@ -9,6 +9,15 @@
 
 <img src="src/assets/img/icon-128.png" width="64"/>
 
+# Eternis Take-home TODO
+
+- [x] Read up on [TLS](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/tls.html)
+- [x] Read up on [TLSNotary](https://tlsnotary.org/)
+- [ ] Get dev extension running without changes
+- [ ] Do warmup changes
+- [ ] Do Problem 1
+- [ ] Do Problem 2
+
 # Chrome Extension (MV3) for TLSNotary
 
 > [!IMPORTANT]
