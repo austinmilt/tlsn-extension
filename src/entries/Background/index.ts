@@ -37,23 +37,20 @@ import browser from 'webextension-polyfill';
     deleteCacheByTabId(tabId);
   });
 
+  const autoNotarizeFilters: browser.WebRequest.RequestFilter = {
+    urls: ['*://api.twitter.com/1.1/account/settings.json*'],
+    types: ['xmlhttprequest'],
+  };
+
   browser.webRequest.onBeforeRequest.addListener(
     onBeforeRequestStoreBody,
-    // filters must match with those used to call onBeforeSendHeadersAutoNotarize
-    {
-      urls: ['*://api.twitter.com/1.1/account/settings.json*'],
-      types: ['xmlhttprequest'],
-    },
+    autoNotarizeFilters,
     ['requestBody'],
   );
 
   browser.webRequest.onBeforeSendHeaders.addListener(
     onBeforeSendHeadersAutoNotarize,
-    // filters must match with those used to call onBeforeRequestStoreBody
-    {
-      urls: ['*://api.twitter.com/1.1/account/settings.json*'],
-      types: ['xmlhttprequest'],
-    },
+    autoNotarizeFilters,
     ['requestHeaders', 'extraHeaders'],
   );
 
