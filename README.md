@@ -16,7 +16,15 @@
 - [x] Read up on [TLSNotary](https://tlsnotary.org/)
 - [x] Get dev extension running without changes
 - [x] Do warmup changes
+    - [x] intercept requests in the background
+    - [x] filter requests to the same as the verify Twitter account function
+    - [x] automatically notarize
+    - [x] put notary requests in the extension history
 - [ ] Do Problem 1
+    - [x] get notary-server running
+    - [x] have tlsn-extension point to local server
+    - [ ] find where the TLSN protocol logic is housed
+    - [ ] change logic to be "just signatures from the notary" (whatever that means)
 - [ ] Do Problem 2
 
 # Chrome Extension (MV3) for TLSNotary
