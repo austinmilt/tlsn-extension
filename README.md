@@ -23,7 +23,7 @@
 - [ ] Do Problem 1
   - [x] get notary-server running
   - [x] have tlsn-extension point to local server
-  - [ ] find where the TLSN protocol logic is housed
+  - [x] find where the TLSN protocol logic is housed
   - [ ] change logic to be "just signatures from the notary" (whatever that means)
 - [ ] Do Problem 2
 
