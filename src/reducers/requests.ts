@@ -1,6 +1,6 @@
 import {
-    type RequestLog,
-    type RequestHistory,
+  type RequestLog,
+  type RequestHistory,
 } from '../entries/Background/rpc';
 import { useSelector } from 'react-redux';
 import { AppRootState } from './index';
@@ -11,44 +11,65 @@ import browser from 'webextension-polyfill';
 import { NOTARY_API, NOTARY_PROXY } from '../utils/constants';
 
 enum ActionType {
-    '/requests/setRequests' = '/requests/setRequests',
-    '/requests/addRequest' = '/requests/addRequest',
-    '/requests/setActiveTab' = '/requests/setActiveTab',
+  '/requests/setRequests' = '/requests/setRequests',
+  '/requests/addRequest' = '/requests/addRequest',
+  '/requests/setActiveTab' = '/requests/setActiveTab',
 }
 
 type Action<payload> = {
-    type: ActionType;
-    payload?: payload;
-    error?: boolean;
-    meta?: any;
+  type: ActionType;
+  payload?: payload;
+  error?: boolean;
+  meta?: any;
 };
 
 type State = {
-    map: {
-        [requestId: string]: RequestLog;
-    };
-    activeTab: chrome.tabs.Tab | null;
+  map: {
+    [requestId: string]: RequestLog;
+  };
+  activeTab: chrome.tabs.Tab | null;
 };
 
 const initialState: State = {
-    map: {},
-    activeTab: null,
+  map: {},
+  activeTab: null,
 };
 
 export const setRequests = (requests: RequestLog[]): Action<RequestLog[]> => ({
-    type: ActionType['/requests/setRequests'],
-    payload: requests,
+  type: ActionType['/requests/setRequests'],
+  payload: requests,
 });
 
-
 // allows the caller to omit some optional fields that are required in RequestHistory
-type NotarizeRequestOptions = Omit<RequestHistory, 'status' | 'id' | 'notaryUrl' | 'websocketProxyUrl'> & Partial<Pick<RequestHistory, 'status' | 'id' | 'notaryUrl' | 'websocketProxyUrl'>>;
+type NotarizeRequestOptions = Omit<
+  RequestHistory,
+  'status' | 'id' | 'notaryUrl' | 'websocketProxyUrl'
+> &
+  Partial<
+    Pick<RequestHistory, 'status' | 'id' | 'notaryUrl' | 'websocketProxyUrl'>
+  >;
 
-export const notarizeRequest = (options: NotarizeRequestOptions) => async (): Promise<Omit<RequestHistory, 'status' | 'id'>> => {
+export const notarizeRequest =
+  (options: NotarizeRequestOptions) =>
+  async (): Promise<Omit<RequestHistory, 'status' | 'id'>> => {
     const notaryUrl = await get(NOTARY_API_LS_KEY, NOTARY_API);
     const websocketProxyUrl = await get(PROXY_API_LS_KEY, NOTARY_PROXY);
 
     const result: Omit<RequestHistory, 'status' | 'id'> = {
+      url: options.url,
+      method: options.method,
+      headers: options.headers,
+      body: options.body,
+      maxTranscriptSize: options.maxTranscriptSize,
+      secretHeaders: options.secretHeaders,
+      secretResps: options.secretResps,
+      notaryUrl,
+      websocketProxyUrl,
+    };
+
+    await chrome.runtime.sendMessage<any, string>({
+      type: BackgroundActiontype.prove_request_start,
+      data: {
         url: options.url,
         method: options.method,
         headers: options.headers,
@@ -58,96 +79,82 @@ export const notarizeRequest = (options: NotarizeRequestOptions) => async (): Pr
         secretResps: options.secretResps,
         notaryUrl,
         websocketProxyUrl,
-    };
-
-    await chrome.runtime.sendMessage<any, string>({
-        type: BackgroundActiontype.prove_request_start,
-        data: {
-            url: options.url,
-            method: options.method,
-            headers: options.headers,
-            body: options.body,
-            maxTranscriptSize: options.maxTranscriptSize,
-            secretHeaders: options.secretHeaders,
-            secretResps: options.secretResps,
-            notaryUrl,
-            websocketProxyUrl,
-        },
+      },
     });
     return result;
-};
+  };
 
 export const setActiveTab = (
-    activeTab: browser.Tabs.Tab | null,
+  activeTab: browser.Tabs.Tab | null,
 ): Action<browser.Tabs.Tab | null> => ({
-    type: ActionType['/requests/setActiveTab'],
-    payload: activeTab,
+  type: ActionType['/requests/setActiveTab'],
+  payload: activeTab,
 });
 
 export const addRequest = (request: RequestLog): Action<RequestLog> => ({
-    type: ActionType['/requests/addRequest'],
-    payload: request,
+  type: ActionType['/requests/addRequest'],
+  payload: request,
 });
 
 export default function requests(
-    state = initialState,
-    action: Action<any>,
+  state = initialState,
+  action: Action<any>,
 ): State {
-    switch (action.type) {
-        case ActionType['/requests/setRequests']:
-            return {
-                ...state,
-                map: {
-                    ...(action?.payload || []).reduce(
-                        (acc: { [requestId: string]: RequestLog }, req: RequestLog) => {
-                            if (req) {
-                                acc[req.requestId] = req;
-                            }
-                            return acc;
-                        },
-                        {},
-                    ),
-                },
-            };
-        case ActionType['/requests/setActiveTab']:
-            return {
-                ...state,
-                activeTab: action.payload,
-            };
-        case ActionType['/requests/addRequest']:
-            return {
-                ...state,
-                map: {
-                    ...state.map,
-                    [action.payload.requestId]: action.payload,
-                },
-            };
-        default:
-            return state;
-    }
+  switch (action.type) {
+    case ActionType['/requests/setRequests']:
+      return {
+        ...state,
+        map: {
+          ...(action?.payload || []).reduce(
+            (acc: { [requestId: string]: RequestLog }, req: RequestLog) => {
+              if (req) {
+                acc[req.requestId] = req;
+              }
+              return acc;
+            },
+            {},
+          ),
+        },
+      };
+    case ActionType['/requests/setActiveTab']:
+      return {
+        ...state,
+        activeTab: action.payload,
+      };
+    case ActionType['/requests/addRequest']:
+      return {
+        ...state,
+        map: {
+          ...state.map,
+          [action.payload.requestId]: action.payload,
+        },
+      };
+    default:
+      return state;
+  }
 }
 
 export const useRequests = (): RequestLog[] => {
-    return useSelector((state: AppRootState) => {
-        return Object.values(state.requests.map);
-    }, deepEqual);
+  return useSelector((state: AppRootState) => {
+    return Object.values(state.requests.map);
+  }, deepEqual);
 };
 
 export const useRequest = (requestId?: string): RequestLog | null => {
-    return useSelector((state: AppRootState) => {
-        return requestId ? state.requests.map[requestId] : null;
-    }, deepEqual);
+  return useSelector((state: AppRootState) => {
+    return requestId ? state.requests.map[requestId] : null;
+  }, deepEqual);
 };
 
 export const useActiveTab = (): chrome.tabs.Tab | null => {
-    return useSelector((state: AppRootState) => {
-        return state.requests.activeTab;
-    }, deepEqual);
+  return useSelector((state: AppRootState) => {
+    return state.requests.activeTab;
+  }, deepEqual);
 };
 
 export const useActiveTabUrl = (): URL | null => {
-    return useSelector((state: AppRootState) => {
-        const activeTab = state.requests.activeTab;
-        return activeTab?.url ? new URL(activeTab.url) : null;
-    }, deepEqual);
+  return useSelector((state: AppRootState) => {
+    const activeTab = state.requests.activeTab;
+    return activeTab?.url ? new URL(activeTab.url) : null;
+  }, deepEqual);
 };

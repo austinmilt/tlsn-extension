@@ -16,15 +16,15 @@
 - [x] Read up on [TLSNotary](https://tlsnotary.org/)
 - [x] Get dev extension running without changes
 - [x] Do warmup changes
-    - [x] intercept requests in the background
-    - [x] filter requests to the same as the verify Twitter account function
-    - [x] automatically notarize
-    - [x] put notary requests in the extension history
+  - [x] intercept requests in the background
+  - [x] filter requests to the same as the verify Twitter account function
+  - [x] automatically notarize
+  - [x] put notary requests in the extension history
 - [ ] Do Problem 1
-    - [x] get notary-server running
-    - [x] have tlsn-extension point to local server
-    - [ ] find where the TLSN protocol logic is housed
-    - [ ] change logic to be "just signatures from the notary" (whatever that means)
+  - [x] get notary-server running
+  - [x] have tlsn-extension point to local server
+  - [ ] find where the TLSN protocol logic is housed
+  - [ ] change logic to be "just signatures from the notary" (whatever that means)
 - [ ] Do Problem 2
 
 # Chrome Extension (MV3) for TLSNotary
@@ -33,13 +33,13 @@
 > ⚠️ When running the extension against a [notary server](https://github.com/tlsnotary/tlsn/tree/dev/notary-server), please ensure that the server's version is the same as the version of this extension
 
 ## License
+
 This repository is licensed under either of
 
 - [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 - [MIT license](http://opensource.org/licenses/MIT)
 
 at your option.
-
 
 ## Installing and Running
 
@@ -57,6 +57,7 @@ at your option.
 6. Happy hacking.
 
 ## Building Websockify Docker Image
+
 ```
 $ git clone https://github.com/novnc/websockify && cd websockify
 $ ./docker/build.sh
@@ -64,6 +65,7 @@ $ docker run -it --rm -p 55688:80 novnc/websockify 80 api.twitter.com:443
 ```
 
 ## Running Websockify Docker Image
+
 ```
 $ cd tlsn-extension
 $ docker run -it --rm -p 55688:80 novnc/websockify 80 api.twitter.com:443
