@@ -14,8 +14,7 @@ import Icon from '../../components/Icon';
 import { urlify } from '../../utils/misc';
 import { get, NOTARY_API_LS_KEY, PROXY_API_LS_KEY } from '../../utils/storage';
 import { useDispatch } from 'react-redux';
-
-const maxTranscriptSize = 16384;
+import { MAX_TRANSCRIPT_SIZE } from '../../utils/constants';
 
 export default function Notarize(): ReactElement {
   const params = useParams<{ requestId: string }>();
@@ -45,13 +44,12 @@ export default function Notarize(): ReactElement {
     headers['Connection'] = 'close';
 
     dispatch(
-      // @ts-ignore
       notarizeRequest({
         url: req.url,
         method: req.method,
         headers,
         body: req.requestBody,
-        maxTranscriptSize,
+        maxTranscriptSize: MAX_TRANSCRIPT_SIZE,
         notaryUrl,
         websocketProxyUrl,
         secretHeaders,

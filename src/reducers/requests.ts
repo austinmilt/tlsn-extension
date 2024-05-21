@@ -40,13 +40,22 @@ export const setRequests = (requests: RequestLog[]): Action<RequestLog[]> => ({
   payload: requests,
 });
 
-export const notarizeRequest = (options: RequestHistory) => async () => {
-  const notaryUrl = await get(NOTARY_API_LS_KEY, NOTARY_API);
-  const websocketProxyUrl = await get(PROXY_API_LS_KEY, NOTARY_PROXY);
+// allows the caller to omit some optional fields that are required in RequestHistory
+type NotarizeRequestOptions = Omit<
+  RequestHistory,
+  'status' | 'id' | 'notaryUrl' | 'websocketProxyUrl'
+> &
+  Partial<
+    Pick<RequestHistory, 'status' | 'id' | 'notaryUrl' | 'websocketProxyUrl'>
+  >;
 
-  chrome.runtime.sendMessage<any, string>({
-    type: BackgroundActiontype.prove_request_start,
-    data: {
+export const notarizeRequest =
+  (options: NotarizeRequestOptions) =>
+  async (): Promise<Omit<RequestHistory, 'status' | 'id'>> => {
+    const notaryUrl = await get(NOTARY_API_LS_KEY, NOTARY_API);
+    const websocketProxyUrl = await get(PROXY_API_LS_KEY, NOTARY_PROXY);
+
+    const result: Omit<RequestHistory, 'status' | 'id'> = {
       url: options.url,
       method: options.method,
       headers: options.headers,
@@ -56,9 +65,24 @@ export const notarizeRequest = (options: RequestHistory) => async () => {
       secretResps: options.secretResps,
       notaryUrl,
       websocketProxyUrl,
-    },
-  });
-};
+    };
+
+    await chrome.runtime.sendMessage<any, string>({
+      type: BackgroundActiontype.prove_request_start,
+      data: {
+        url: options.url,
+        method: options.method,
+        headers: options.headers,
+        body: options.body,
+        maxTranscriptSize: options.maxTranscriptSize,
+        secretHeaders: options.secretHeaders,
+        secretResps: options.secretResps,
+        notaryUrl,
+        websocketProxyUrl,
+      },
+    });
+    return result;
+  };
 
 export const setActiveTab = (
   activeTab: browser.Tabs.Tab | null,

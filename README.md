@@ -15,13 +15,13 @@
 > ⚠️ When running the extension against a [notary server](https://github.com/tlsnotary/tlsn/tree/dev/notary-server), please ensure that the server's version is the same as the version of this extension
 
 ## License
+
 This repository is licensed under either of
 
 - [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 - [MIT license](http://opensource.org/licenses/MIT)
 
 at your option.
-
 
 ## Installing and Running
 
@@ -39,6 +39,7 @@ at your option.
 6. Happy hacking.
 
 ## Building Websockify Docker Image
+
 ```
 $ git clone https://github.com/novnc/websockify && cd websockify
 $ ./docker/build.sh
@@ -46,6 +47,7 @@ $ docker run -it --rm -p 55688:80 novnc/websockify 80 api.twitter.com:443
 ```
 
 ## Running Websockify Docker Image
+
 ```
 $ cd tlsn-extension
 $ docker run -it --rm -p 55688:80 novnc/websockify 80 api.twitter.com:443

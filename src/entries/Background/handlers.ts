@@ -1,8 +1,15 @@
 import { getCacheByTabId } from './cache';
-import { BackgroundActiontype, RequestLog } from './rpc';
+import {
+  BackgroundActiontype,
+  RequestLog,
+  handleProveRequestStart,
+} from './rpc';
 import mutex from './mutex';
 import browser from 'webextension-polyfill';
-import { addRequest } from '../../reducers/requests';
+import { addRequest, notarizeRequest } from '../../reducers/requests';
+import { urlify } from '../../utils/misc';
+import { MAX_TRANSCRIPT_SIZE } from '../../utils/constants';
+import { BOOKMARKS } from '../../../utils/bookmark';
 
 export const onSendHeaders = (
   details: browser.WebRequest.OnSendHeadersDetailsType,
@@ -23,6 +30,14 @@ export const onSendHeaders = (
         tabId: tabId,
         requestId: requestId,
       });
+    }
+
+    if (shouldAutoCapture(details)) {
+      const cache = getCacheByTabId(tabId);
+      const existing = cache.get<RequestLog>(requestId);
+      if (existing != null) {
+        autoNotarizeRequest(existing);
+      }
     }
   });
 };
@@ -94,4 +109,56 @@ export const onResponseStarted = (
       action: addRequest(newLog),
     });
   });
+};
+
+// adapted from Home/index.tsx
+const autoNotarizeRequest = async (req: RequestLog): Promise<void> => {
+  const hostname = urlify(req.url)?.hostname;
+
+  const noteHeaders: { [k: string]: string } = req.requestHeaders?.reduce(
+    (acc: any, h) => {
+      acc[h.name] = h.value;
+      return acc;
+    },
+    { Host: hostname },
+  );
+
+  //TODO: for some reason, these needs to be override to work
+  noteHeaders['Accept-Encoding'] = 'identity';
+  noteHeaders['Connection'] = 'close';
+
+  const noteDetails = {
+    url: req.url,
+    method: req.method,
+    headers: noteHeaders,
+    body: req.requestBody,
+    maxTranscriptSize: MAX_TRANSCRIPT_SIZE,
+    // TODO are there any secretHeaders or secretResps to include? see Home/index.tsx
+  };
+  const hydratedDetails = await notarizeRequest(noteDetails)();
+
+  // TODO this should automatically happen as part of the initRpc message listeners intercepting
+  // the message produced by notarizeRequest. However, it's not happening when called from the
+  // here so I am forcing the next event stage
+  await handleProveRequestStart(
+    { type: BackgroundActiontype.prove_request_start, data: hydratedDetails },
+    () => null,
+  );
+};
+
+const shouldAutoCapture = (
+  details:
+    | browser.WebRequest.OnSendHeadersDetailsType
+    | browser.WebRequest.OnBeforeRequestDetailsType,
+): boolean => {
+  for (let bookmark of BOOKMARKS) {
+    if (
+      details.method === bookmark.method &&
+      details.type === bookmark.type &&
+      details.url.includes(bookmark.url)
+    ) {
+      return true;
+    }
+  }
+  return false;
 };

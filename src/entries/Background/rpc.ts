@@ -202,7 +202,8 @@ async function handleRetryProveReqest(
   return sendResponse();
 }
 
-async function handleProveRequestStart(
+// TODO revert to not exported when you have figured out how to get handlers/autoNotarizeRequest to work
+export async function handleProveRequestStart(
   request: BackgroundAction,
   sendResponse: (data?: any) => void,
 ) {

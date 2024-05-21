@@ -1,13 +1,15 @@
 import bookmarks from './bookmarks.json';
 import { RequestLog } from '../../src/entries/Background/rpc';
 
-type Bookmark = {
+export type Bookmark = {
   url: string;
   title: string;
   description: string;
   method: string;
   type: string;
 };
+
+export const BOOKMARKS: Bookmark[] = bookmarks;
 
 export function findBookmarksByURL(url: URL | null): Bookmark[] {
   if (!url) return [];
