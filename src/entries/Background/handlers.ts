@@ -154,13 +154,11 @@ const shouldAutoCapture = (
         | browser.WebRequest.OnBeforeRequestDetailsType,
 ): boolean => {
     for (let bookmark of BOOKMARKS) {
-        console.log('trying', bookmark);
         if (
             (details.method === bookmark.method) &&
             (details.type === bookmark.type) &&
             details.url.includes(bookmark.url)
         ) {
-            console.log('found', bookmark.title);
             return true;
         }
     }
