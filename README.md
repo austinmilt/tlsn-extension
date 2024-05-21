@@ -9,24 +9,6 @@
 
 <img src="src/assets/img/icon-128.png" width="64"/>
 
-# Eternis challenge TODO
-
-- [x] Read [engineering challenge doc](https://eternis.notion.site/Engineering-challenge-afb931caee2245fc9b45f51930821248)
-- [x] Read up on [TLS](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/tls.html)
-- [x] Read up on [TLSNotary](https://tlsnotary.org/)
-- [x] Get dev extension running without changes
-- [x] Do warmup changes
-  - [x] intercept requests in the background
-  - [x] filter requests to the same as the verify Twitter account function
-  - [x] automatically notarize
-  - [x] put notary requests in the extension history
-- [ ] Do Problem 1
-  - [x] get notary-server running
-  - [x] have tlsn-extension point to local server
-  - [x] find where the TLSN protocol logic is housed
-  - [ ] change logic to be "just signatures from the notary" (whatever that means)
-- [ ] Do Problem 2
-
 # Chrome Extension (MV3) for TLSNotary
 
 > [!IMPORTANT]
